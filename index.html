@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="IE=Edge">
+<title>ポケミクのたつじん</title>
+<script src='js/jquery-1.11.0.min.js'></script>
+<script src='js/midi.js'></script>
+<script src='js/smfplayer.js'></script>
+<script type='text/javascript'>
+var curword=0;
+function onmessage(message,timestamp) {
+	if (message[0]==0xf0) {
+		var sysexhead = [0xF0,0x43,0x79,0x09,0x11,0x0A,0x00];
+		if (message.length != (sysexhead.length+1+1)) return;
+		for (var i=0;i<sysexhead.length;i++) {
+			if (message[i] != sysexhead[i]) return;
+		}
+		if (message[sysexhead.length+1] != 0xf7) return;
+		curword=message[sysexhead.length];
+	} else if ((message[0] == 0x90) || (message[0] == 0x80)) {
+		$('#iframe0')[0].contentWindow.onmessage(message,curword,timestamp);
+	}
+}
+
+</script>
+</head>
+<body>
+	<h1>ポケミクのたつじん</h1>
+	<select id="midiInputSelect" onchange="selectMidiInput()">
+		<option value="1">select input port</option>
+	</select>
+	<br/>
+	<select id="midiOutputSelect" onchange="selectMidiOutput()">
+		<option value="1">select output port</option>
+	</select>
+	<script type="text/javascript">
+	midiAccess = navigator.requestMIDIAccess({
+		sysex : true
+	}).then(onMIDISuccess, onMIDIFailure);
+	</script>
+	<form>
+		<input type="file" id="filedialog" name="file" onchange="onSelectedFile()" accept="audio/mid"/>
+	</form>
+	<!-- button type="button" id="stop" onclick="stop()">stop</button>
+	<button type="button" id="play" onclick="play()">play</button>
+	<br/>
+	<button type="button" id="allnoteoff" onclick="allnoteoff()">panic</button>
+	<br>
+	<progress value="0" max="100" id="progress"></progress -->
+	<hr/>
+	<div>
+	<iframe id='iframe0' src='game.html'></iframe>
+	<style>
+		iframe {
+			width: 864px;
+			height: 480px;
+		}
+	</style>
+	</div>
+</body>
+</html>
