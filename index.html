@@ -44,44 +44,49 @@ function onmessage(message,timestamp) {
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Link</a></li>
-        <li><a href="#">Link</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li class="divider"></li>
-            <li><a href="#">Separated link</a></li>
-            <li class="divider"></li>
-            <li><a href="#">One more separated link</a></li>
-          </ul>
-        </li>
-      </ul>
+    	<ul class="nav navbar-nav">
+    		<li class="dropdown">
+    			<a data-toggle="modal" href="#settingModal" data-toggle="dropdown">設定</b></a>
+    		</li>
+    		<li><a href="help.html" target="_blank">ヘルプ</a></li>
+    	</ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>	
+ 
+<div class="modal fade" id="settingModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">設定</h4>
+			</div>
+			<div class="modal-body">
+				<div id="divMidiInSelWarning"></div>
+				<select id="midiInputSelect" type= "text" class="form-control input"　onchange="selectMidiInput()">
+					<option value="1">MIDI INポートの選択</option>
+				</select>
+				<br/>
+				<select id="midiOutputSelect" type="text"  class="form-control input"　onchange="selectMidiOutput()">
+					<option value="1">MIDI OUTポートの選択</option>
+				</select>
+				<p>
+				<form aria-hidden="true">
+					<input type="file" id="filedialog" name="file" onchange="onSelectedFile()" accept="audio/mid"/>
+				</form>
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div>
 <img src='images/PokemikunoTatsujinLogo.png' width='20%' height='20%'>
-	<br>
-	<select id="midiInputSelect" onchange="selectMidiInput()">
-		<option value="1">select input port</option>
-	</select>
-	<br/>
-	<select id="midiOutputSelect" onchange="selectMidiOutput()">
-		<option value="1">select output port</option>
-	</select>
-	<script type="text/javascript">
-	midiAccess = navigator.requestMIDIAccess({
-		sysex : true
-	}).then(onMIDISuccess, onMIDIFailure);
-	</script>
-	<form>
-		<input type="file" id="filedialog" name="file" onchange="onSelectedFile()" accept="audio/mid"/>
-	</form>
-	<hr/>
-	<div>
+</div>
+<hr/>
+<div>
 	<iframe id='iframe0' src='game.html'></iframe>
 	<style>
 		iframe {
@@ -89,6 +94,11 @@ function onmessage(message,timestamp) {
 			height: 480px;
 		}
 	</style>
-	</div>
+</div>
+<script type="text/javascript">
+	midiAccess = navigator.requestMIDIAccess({
+		sysex : true
+	}).then(onMIDISuccess, onMIDIFailure);
+</script>
 </body>
 </html>

@@ -379,7 +379,7 @@ function getNext() {
 	}
 	function doInterval() {
 		var currenttime = window.performance.now();
-		var targettime = currenttime+playerinfo.buffer*2;
+		var targettime = currenttime+playerinfo.buffer;
 		while (1) {
 			if (!playerinfo.playing) return;
 			if (songinfo.nexteventtime>=targettime) break;
