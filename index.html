@@ -11,21 +11,15 @@
 <script src='js/midi.js'></script>
 <script src='js/smfplayer.js'></script>
 <script type='text/javascript'>
-var curword=0;
 function onmessage(message,timestamp) {
-	if (message[0]==0xf0) {
-		var sysexhead = [0xF0,0x43,0x79,0x09,0x11,0x0A,0x00];
-		if (message.length != (sysexhead.length+1+1)) return;
-		for (var i=0;i<sysexhead.length;i++) {
-			if (message[i] != sysexhead[i]) return;
-		}
-		if (message[sysexhead.length+1] != 0xf7) return;
-		curword=message[sysexhead.length];
-	} else if ((message[0] == 0x90) || (message[0] == 0x80)) {
-		$('#iframe0')[0].contentWindow.onmessage(message,curword,timestamp);
-	}
+	$('#iframe0')[0].contentWindow.onmessage(message,timestamp);
 }
-
+function ontempochange(tempo,timestamp) {
+	$('#iframe0')[0].contentWindow.settempo(tempo,timestamp);	
+}
+function onsongend() {
+	$('#iframe0')[0].contentWindow.onsongend();	
+}
 </script>
 </head>
 <body>

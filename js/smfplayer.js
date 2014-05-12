@@ -349,22 +349,27 @@ function getNext() {
 		playerinfo.init();
 		//progressbar.value = 0;
 	}
+	var dequeueTimer;
 	function stop() {
 		clearInterval(playerinfo.timer);
+		clearInterval(dequeueTimer);
 		reset();
 		allnoteoff();
 	}
 	function pause() {
 		clearInterval(playerinfo.timer);
+		clearInterval(dequeueTimer);
 		playerinfo.playing = false;
 		allnoteoff();
 	}
+	var dequeueTimer;
 	function play() {
 		if (!smfinfo.isValid) return;
 		playerinfo.starttime = window.performance.now();
 		playerinfo.playing = true;
 		doInterval();
 		playerinfo.timer = setInterval('doInterval()',playerinfo.buffer);
+		timer4dequeue = setInterval('doDequeue()',playerinfo.buffer);
 		return playerinfo.starttime;
 	}
 	function gettime(tick) {
@@ -377,35 +382,62 @@ function getNext() {
 		if (tempo==playerinfo.tempo[playerinfo.tempo.length-1].tempo) return;
 		playerinfo.tempo.push({time:gettime(tick),tickcount:tick,tempo:tempo});
 	}
+	var preloadbuf = [];
+	var preloadtime = 4000; // milli second
 	function doInterval() {
 		var currenttime = window.performance.now();
 		var targettime = currenttime+playerinfo.buffer;
-		while (1) {
-			if (!playerinfo.playing) return;
+		if (!playerinfo.playing) return;
+		while (1) { // preload
 			if (songinfo.nexteventtime>=targettime) break;
 			var message = getNext();
 			//progressbar.value = songinfo.ptr;
 			if (!message.result) {
 				playerinfo.playing = false;
-				pause();
+				clearInterval(playerinfo.timer);
 				break;
 			};
 			playerinfo.totaltick += message.deltatime;
 			if (message.type=="meta:tempo") {
 				setTempo(playerinfo.totaltick,playerinfo.nexttempo);
 				playerinfo.nexttempo = -1;
+				var tempo=playerinfo.tempo[playerinfo.tempo.length-1];
+				ontempochange(tempo.tempo,tempo.time);
 			}
-			var timestamp = gettime(playerinfo.totaltick)+playerinfo.starttime;
+			var totaltime = gettime(playerinfo.totaltick);
+			var timestamp = totaltime+playerinfo.starttime;
 			//showData(timestamp,message);
 			if (message.type=="data") {
-				if (output) {
-					output.send(message.message,timestamp);
-				}
-				onmessage(message.message,timestamp);
+				preloadbuf.push({message:message,timestamp:timestamp+preloadtime});
+				onmessage(message.message,totaltime+preloadtime);
 			}
 			if (timestamp>targettime) {
 				songinfo.nexteventtime = timestamp;
 				break;
 			}
 		};
+	}
+	function stopDequeue() {
+		clearInterval(dequeueTimer);
+		onsongend();
+	}
+	function doDequeue() {
+		var currenttime = window.performance.now();
+		var targettime = currenttime+playerinfo.buffer;
+		var i=0;
+		while (1) {
+			if (!preloadbuf[i]) {
+				if (!playerinfo.playing) stopDequeue();
+				break;
+			}
+			data=preloadbuf[i];
+			if (data.timestamp>targettime) {
+				if (i!=0) preloadbuf.splice(0,i);
+				break;
+			}
+			if (output) {
+				output.send(message.message,timestamp);
+			}
+			i++;
+		}
 	}

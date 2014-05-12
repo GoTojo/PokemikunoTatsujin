@@ -1,23 +1,40 @@
 enchant();
 
 var core;
-
+var startframe;
+var oct=12*4;
 var WordObj=Class.create(Sprite, {
-	initialize: function(note,word) {
-		var num=(note-5);
+	beginframe:0,
+	endframe:0,
+	initialize: function(note,word,timestamp) {
+		var num=(note-5)-oct;
 		var maxnum=27;
-		if (num<0) num+=12;
+		while (num<0) num+=12;
 		while (num>maxnum) num-=12;
 		Sprite.call(this,32,32);
 		this.x = num*32;
-		this.y = rand(100);
+		this.y = 0;
 		this.frame = word;		
 		this.image = core.assets['images/PocketMiku.png'];
-
+		//this.opacity(0.0);
+		this.beginframe=Math.floor(timestamp*core.fps/1000)+startframe;
 		core.rootScene.addChild(this);
+		console.log("beginframe:"+this.beginframe);
 	},
-	remove: function() {
-		this.parentNode.removeChild(this);
+	onenterframe: function() {
+		this.y+=3;
+		if (core.frame==this.beginframe) {
+			//this.opacity(1.0);
+			console.log("begin fire:"+core.frame);
+		}
+		if ((this.endframe!=0) && (core.frame>=this.endframe)) {
+			console.log("end fire:"+core.frame);
+			core.rootScene.removeChild(this);
+		}
+	},
+	noteoff: function(timestamp) {
+		this.endframe=Math.floor(timestamp*core.fps/1000)+startframe;
+		console.log("endframe:"+this.endframe);
 	}
 });
 
@@ -44,6 +61,7 @@ window.onload = function() {
 	core.onload = function() {
 		var bears = [];
 		var startFunction = function() {
+			startframe=core.frame;
 			this.parentNode.removeChild(this);
 			play();
 		};
@@ -56,26 +74,39 @@ window.onload = function() {
 	core.start();
 
 };
-
-var starttime=0;
 var words=[];
+var curword=0;
+var tempo=60000000/120; //BPM=120
+
 // parent->iframe
-function onmessage(message,word,timestamp) {
-	console.log(message+','+word+','+timestamp);
-	if ((message[0]==0x90) && (message[2]!=0)) { // note on
+function onmessage(message,timestamp) {
+	if (message[0]==0xf0) {
+		var sysexhead = [0xF0,0x43,0x79,0x09,0x11,0x0A,0x00];
+		if (message.length != (sysexhead.length+1+1)) return;
+		for (var i=0;i<sysexhead.length;i++) {
+			if (message[i] != sysexhead[i]) return;
+		}
+		if (message[sysexhead.length+1] != 0xf7) return;
+		curword=message[sysexhead.length];
+	} else if ((message[0]==0x90) && (message[2]!=0)) { // note on
 		var note = message[1];
-		if (!words[note.toString(16)]) words[note.toString(16)] = new WordObj(note,word);
+		words[note.toString(16)] = new WordObj(note,curword,timestamp-tempo*4/1000);
 	} else if ((message[0]==0x80) || (message[0]==0x90)) {
 		var note = message[1];
 		if (words[note.toString(16)]) {
-			words[note.toString(16)].remove();
+			words[note.toString(16)].noteoff(timestamp);
 			delete words[note.toString(16)];
 		}
 	}
 }
+function onsongend() {
+}
+function settempo(tempo,timestamp) {
+	tempo=tempo;
+}
 // iframe->parent
 function play() {
-	starttime=window.parent.play();
+	window.parent.play();
 }
 
 function stop() {
