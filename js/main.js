@@ -13,6 +13,10 @@ var WordObj=Class.create(Sprite, {
 	endframe:0,
 	dropping:false,
 	downstep:0,
+	negi:undefined,
+	negibeginframe:0,
+	negidropping:false,
+	negidownstep:0,
 	initialize: function(note,word,timestamp) {
 		var num=(note-5)-oct;
 		var maxnum=27;
@@ -26,14 +30,20 @@ var WordObj=Class.create(Sprite, {
 		this.opacity = 0.0;
 		this.beginframe=Math.floor((timestamp-tempo*4/1000)*core.fps/1000)+startframe;
 		var framecount=tempo*4/1000000*fps;
-		this.downstep=windowWidth/framecount;
-		console.log('downstep:'+this.downstep);
+		this.downstep=windowHeight/framecount;
+		this.negidownstep=(windowHeight)/framecount;
+		this.negi=new Sprite(12,30);
+		this.negi.image=core.assets['images/negi.png'];
+		this.negi.x = this.x+10;
+		this.negi.y = 0;
+		this.negi.opacity=0.0;
+		core.rootScene.addChild(this.negi);
 		core.rootScene.addChild(this);
-		console.log("beginframe:"+this.beginframe);
+		//console.log("beginframe:"+this.beginframe);
 	},
 	onenterframe: function() {
 		if (this.dropping) {
-			if (this.y>=windowWidth-32) {
+			if (this.y>=windowHeight-32) {
 				this.dropping=false;
 			} else {
 				this.y+=this.downstep;
@@ -43,17 +53,31 @@ var WordObj=Class.create(Sprite, {
 			this.opacity = 1.0;			
 		}
 		if (core.frame==this.beginframe) {
-			console.log("begin fire:"+core.frame);
+			//console.log("begin fire:"+core.frame);
 			this.dropping=true;
 		}
 		if ((this.endframe!=0) && (core.frame>=this.endframe)) {
-			console.log("end fire:"+core.frame);
+			//console.log("end fire:"+core.frame);
 			core.rootScene.removeChild(this);
+			if (this.negi) core.rootScene.removeChild(this.negi);
+		}
+		if (core.frame==this.negibeginframe) {
+			//console.log("begin fire:"+core.frame);
+			this.negi.opacity=1.0;
+			this.negidropping=true;
+		}
+		if (this.negidropping) {
+			if (this.negi.y>=windowHeight-32) {
+				this.negidropping=false;
+			} else {
+				this.negi.y+=this.negidownstep;
+			}
 		}
 	},
 	noteoff: function(timestamp) {
+		this.negibeginframe=Math.floor((timestamp-tempo*4/1000)*core.fps/1000)+startframe;
 		this.endframe=Math.floor(timestamp*core.fps/1000)+startframe;
-		console.log("endframe:"+this.endframe);
+		var framecount=tempo*4/1000000*fps;
 	}
 });
 
@@ -75,6 +99,7 @@ window.onload = function() {
 	core.fps = fps;
 	core.preload('images/PocketMiku.png');
 	core.preload('images/start.png');
+	core.preload('images/negi.png');
 	var isStart=false;
 
 	core.onload = function() {

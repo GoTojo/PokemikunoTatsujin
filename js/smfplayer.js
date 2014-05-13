@@ -436,7 +436,9 @@ function getNext() {
 				break;
 			}
 			if (output) {
-				output.send(data.message,data.timestamp);
+				//if ((data.message[0]!=0x90)&&(data.message[0]!=0x80)) {
+					output.send(data.message,data.timestamp);
+				//}
 			}
 			i++;
 		}
