@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="x-ua-compatible" content="IE=Edge">
-<title>ポケミクのたつじん</title>
+<title>ポケミクの達人</title>
 <link href='css/bootstrap.css' rel='stylesheet'>
 <script src='js/jquery-1.11.0.min.js'></script>
 <script src='js/bootstrap.min.js'></script>
@@ -20,6 +20,12 @@ function ontempochange(tempo,timestamp) {
 function onsongend() {
 	$('#iframe0')[0].contentWindow.onsongend();	
 }
+$(function() {
+$('#midiOutputSelect').click(function() {
+	console.log('midiout selected');
+	selectMidiOutput();
+})
+});
 </script>
 </head>
 <body>

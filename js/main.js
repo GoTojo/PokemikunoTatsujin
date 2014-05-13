@@ -3,9 +3,16 @@ enchant();
 var core;
 var startframe;
 var oct=12*4;
+var windowWidth=864;
+var windowHeight=480;
+var tempo=60000000/120; //BPM=120
+var fps=30;
+var frameShowWord=15;
 var WordObj=Class.create(Sprite, {
 	beginframe:0,
 	endframe:0,
+	dropping:false,
+	downstep:0,
 	initialize: function(note,word,timestamp) {
 		var num=(note-5)-oct;
 		var maxnum=27;
@@ -16,16 +23,28 @@ var WordObj=Class.create(Sprite, {
 		this.y = 0;
 		this.frame = word;		
 		this.image = core.assets['images/PocketMiku.png'];
-		//this.opacity(0.0);
-		this.beginframe=Math.floor(timestamp*core.fps/1000)+startframe;
+		this.opacity = 0.0;
+		this.beginframe=Math.floor((timestamp-tempo*4/1000)*core.fps/1000)+startframe;
+		var framecount=tempo*4/1000000*fps;
+		this.downstep=windowWidth/framecount;
+		console.log('downstep:'+this.downstep);
 		core.rootScene.addChild(this);
 		console.log("beginframe:"+this.beginframe);
 	},
 	onenterframe: function() {
-		this.y+=3;
+		if (this.dropping) {
+			if (this.y>=windowWidth-32) {
+				this.dropping=false;
+			} else {
+				this.y+=this.downstep;
+			}
+		}
+		if (core.frame==this.beginframe-frameShowWord) {
+			this.opacity = 1.0;			
+		}
 		if (core.frame==this.beginframe) {
-			//this.opacity(1.0);
 			console.log("begin fire:"+core.frame);
+			this.dropping=true;
 		}
 		if ((this.endframe!=0) && (core.frame>=this.endframe)) {
 			console.log("end fire:"+core.frame);
@@ -50,16 +69,15 @@ var StartLogo=Class.create(Sprite, {
 });
 
 window.onload = function() {
-	core = new Core(864,480);
+	core = new Core(windowWidth,windowHeight);
 	core.rootScene.backgroundColor = "black";
 
-	core.fps = 30;
+	core.fps = fps;
 	core.preload('images/PocketMiku.png');
 	core.preload('images/start.png');
 	var isStart=false;
 
 	core.onload = function() {
-		var bears = [];
 		var startFunction = function() {
 			startframe=core.frame;
 			this.parentNode.removeChild(this);
@@ -76,7 +94,6 @@ window.onload = function() {
 };
 var words=[];
 var curword=0;
-var tempo=60000000/120; //BPM=120
 
 // parent->iframe
 function onmessage(message,timestamp) {
@@ -90,7 +107,7 @@ function onmessage(message,timestamp) {
 		curword=message[sysexhead.length];
 	} else if ((message[0]==0x90) && (message[2]!=0)) { // note on
 		var note = message[1];
-		words[note.toString(16)] = new WordObj(note,curword,timestamp-tempo*4/1000);
+		words[note.toString(16)] = new WordObj(note,curword,timestamp);
 	} else if ((message[0]==0x80) || (message[0]==0x90)) {
 		var note = message[1];
 		if (words[note.toString(16)]) {

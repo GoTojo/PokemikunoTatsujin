@@ -37,6 +37,7 @@
 		var select = document.getElementById("midiInputSelect");
 		var options = document.getElementById("midiInputSelect").options;
 		var value = options.item(select.selectedIndex).value;
+		if (select.selectedIndex==0) return;
 		try { 
 			var inputs = midiAccess.inputs();
 			var input = inputs[select.selectedIndex-1];
@@ -50,9 +51,11 @@
 		var select = document.getElementById("midiOutputSelect");
 		var options = document.getElementById("midiOutputSelect").options;
 		var value = options.item(select.selectedIndex).value;
+		if (select.selectedIndex==0) return;
 		try { 
 			var outputs = midiAccess.outputs();
 			output = outputs[select.selectedIndex-1];
+			console.log('output('+output.name+')is selected')
 		} catch (e) {
 			alert("Exception! Couldn't get i/o ports." + e );
 		}

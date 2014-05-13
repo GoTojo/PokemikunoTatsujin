@@ -408,7 +408,7 @@ function getNext() {
 			var timestamp = totaltime+playerinfo.starttime;
 			//showData(timestamp,message);
 			if (message.type=="data") {
-				preloadbuf.push({message:message,timestamp:timestamp+preloadtime});
+				preloadbuf.push({message:message.message,timestamp:timestamp+preloadtime});
 				onmessage(message.message,totaltime+preloadtime);
 			}
 			if (timestamp>targettime) {
@@ -436,7 +436,7 @@ function getNext() {
 				break;
 			}
 			if (output) {
-				output.send(message.message,timestamp);
+				output.send(data.message,data.timestamp);
 			}
 			i++;
 		}
