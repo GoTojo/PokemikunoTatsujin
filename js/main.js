@@ -115,6 +115,7 @@ window.onload = function() {
 	core.preload('images/PocketMiku.png');
 	core.preload('images/start.png');
 	core.preload('images/negi.png');
+	core.preload('images/PocketMikuBG.png');
 	var isStart=false;
 
 	core.onload = function() {
@@ -129,6 +130,9 @@ window.onload = function() {
 			stop();
 			startLogo.showlogo();
 		}
+		var bgimage= new Sprite(windowWidth,windowHeight);
+		bgimage.image=core.assets['images/PocketMikuBG.png'];
+		core.rootScene.addChild(bgimage);
 		var startLogo = new StartLogo(startFunction);
 	}
 	core.start();
