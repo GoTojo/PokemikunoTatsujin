@@ -20,11 +20,19 @@ function ontempochange(tempo,timestamp) {
 function onsongend() {
 	$('#iframe0')[0].contentWindow.onsongend();	
 }
-$(function() {
-$('#midiOutputSelect').click(function() {
-	console.log('midiout selected');
+function checkReady() {
+	if (smfinfo.isValid) {
+		return true;
+	} else {
+		$('#smfalert').modal('show');
+	}
+}
+$('#midiOutputSelect').bind('change',function() {
 	selectMidiOutput();
-})
+});
+
+$('#midiInputSelect').bind('change',function() {
+	selectMidiInput();
 });
 </script>
 </head>
@@ -70,7 +78,9 @@ $('#midiOutputSelect').click(function() {
 				<select id="midiOutputSelect" type="text"  class="form-control input"　onchange="selectMidiOutput()">
 					<option value="1">MIDI OUTポートの選択</option>
 				</select>
+				<br>
 				<p>
+				SMFの選択<br>
 				<form aria-hidden="true">
 					<input type="file" id="filedialog" name="file" onchange="onSelectedFile()" accept="audio/mid"/>
 				</form>
@@ -82,6 +92,21 @@ $('#midiOutputSelect').click(function() {
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+<div class="modal fade" id="smfalert" tabindex="-1" role="dialog" aria-labelledby="myAlertLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">アラート</h5>
+			</div>
+			<div class="modal-body">
+ 			 <h4><strong>SMFを選択してください</strong></h4>
+ 			 </div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
 <div>
 <img src='images/PokemikunoTatsujinLogo.png' width='20%' height='20%'>
 </div>

@@ -24,18 +24,18 @@ var WordObj=Class.create(Sprite, {
 		while (num>maxnum) num-=12;
 		Sprite.call(this,32,32);
 		this.x = num*32;
-		this.y = 0;
+		this.y = 32;
 		this.frame = word;		
 		this.image = core.assets['images/PocketMiku.png'];
 		this.opacity = 0.0;
 		this.beginframe=Math.floor((timestamp-tempo*4/1000)*core.fps/1000)+startframe;
 		var framecount=tempo*4/1000000*fps;
-		this.downstep=windowHeight/framecount;
-		this.negidownstep=(windowHeight)/framecount;
+		this.downstep=(windowHeight-32)/framecount;
+		this.negidownstep=(windowHeight-32)/framecount;
 		this.negi=new Sprite(12,30);
 		this.negi.image=core.assets['images/negi.png'];
 		this.negi.x = this.x+10;
-		this.negi.y = 0;
+		this.negi.y = 32;
 		this.negi.opacity=0.0;
 		core.rootScene.addChild(this.negi);
 		core.rootScene.addChild(this);
@@ -78,17 +78,32 @@ var WordObj=Class.create(Sprite, {
 		this.negibeginframe=Math.floor((timestamp-tempo*4/1000)*core.fps/1000)+startframe;
 		this.endframe=Math.floor(timestamp*core.fps/1000)+startframe;
 		var framecount=tempo*4/1000000*fps;
+	},
+	removeall: function() {
+		this.dropping=false;
+		this.negidropping=false;
+		core.rootScene.removeChild(this);
+		core.rootScene.removeChild(this.negi);
 	}
 });
 
 var StartLogo=Class.create(Sprite, {
+	shown:false,
 	initialize: function(f) {
 		Sprite.call(this,450,115);
 		this.image = core.assets['images/start.png'];
 		this.x = core.rootScene.width/2-this.width/2;
 		this.y = core.rootScene.height/2-this.height/2
 		this.ontouchstart=f;
+		this.showlogo();
+	},
+	hidelogo: function() {
+		core.rootScene.removeChild(this);
+		this.shown=false;
+	},
+	showlogo: function() {
 		core.rootScene.addChild(this);
+		this.shown=true;
 	}
 });
 
@@ -104,13 +119,15 @@ window.onload = function() {
 
 	core.onload = function() {
 		var startFunction = function() {
-			startframe=core.frame;
-			this.parentNode.removeChild(this);
-			play();
+			if (window.parent.checkReady()) {
+				startframe=core.frame;
+				this.hidelogo();
+				play();
+			}
 		};
 		core.rootScene.ontouchstart = function () {
 			stop();
-			var startLogo = new StartLogo(startFunction);
+			startLogo.showlogo();
 		}
 		var startLogo = new StartLogo(startFunction);
 	}

@@ -1,6 +1,7 @@
 	var filereader = new FileReader();
 	var file = null;
 	//var progressbar = document.getElementById("progress");
+	var preloadtime = 4000; // milli second
 
 	var playerinfo = function() {
 		var buffer; // millisecond
@@ -383,7 +384,6 @@ function getNext() {
 		playerinfo.tempo.push({time:gettime(tick),tickcount:tick,tempo:tempo});
 	}
 	var preloadbuf = [];
-	var preloadtime = 4000; // milli second
 	function doInterval() {
 		var currenttime = window.performance.now();
 		var targettime = currenttime+playerinfo.buffer;
