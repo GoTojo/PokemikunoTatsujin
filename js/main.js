@@ -8,12 +8,13 @@ var windowHeight=480;
 var tempo=60000000/120; //BPM=120
 var fps=30;
 var frameShowWord=15;
-var wordXpos = [];
-var targets;
+var wordXpos=[];
+var target=[];
+var maxnum=27;
+var words=[];
 (function() {
 	var wordXposLeft=12;
 	var wordXposGapWB=27;
-	var wordXposGapWW=54;
 	var idx=0;
 	var offset=wordXposLeft;
 	for (var i=0;i<7;i++) { wordXpos[idx]=offset+wordXposGapWB*idx; idx++; }
@@ -25,160 +26,151 @@ var targets;
 	for (var i=0;i<5;i++) { wordXpos[idx]=offset+wordXposGapWB*idx; idx++; }
 	offset+=wordXposGapWB;
 	for (var i=0;i<3;i++) { wordXpos[idx]=offset+wordXposGapWB*idx; idx++; }
+	for (var i=0;i<128;i++) {
+		words[i]=[];
+	}
 })();
 var scoreAreaHeight=32;
 var dropStartPosY=scoreAreaHeight;
 var lastPosY=windowHeight-32;
 var dropHeight=lastPosY-dropStartPosY;
-var WordObj=Class.create(Sprite, {
+var BlinkTargetObj=Class.create(Sprite, {
+	showframe:0,
+	endframe:0,
+	framecount:0,
+	initialize: function(num,showframe) {
+		Sprite.call(this,32,32);
+		this.x=wordXpos[num];
+		this.y=lastPosY-1;
+		this.image=core.assets['images/maru.png'];
+		this.frame=2;
+		this.opacity = 0.0;
+		this.showframe=showframe;
+		this.framecount=Math.floor(tempo/2/1000000*core.fps);
+		core.rootScene.addChild(this);
+	},
+	onenterframe: function() {
+		if (core.frame>this.showframe) {
+			if ((core.frame%this.framecount)==0) {
+				if (this.opacity) { 
+					this.opacity=0.0; 
+				} else {
+					this.opacity=1.0;
+				} 
+			}
+		}
+		if ((this.endframe!=0) && (core.frame>=this.endframe)) {
+			core.rootScene.removeChild(this);
+		}
+	}
+});
+var WordObjBase=Class.create(Sprite, {
 	beginframe:0,
+	showframe:0,
 	endframe:0,
 	dropping:false,
 	downstep:0,
-	negi:undefined,
-	negibeginframe:0,
-	negidropping:false,
-	negidownstep:0,
 	num:0,
-	initialize: function(note,word,timestamp) {
+	note:0,
+	initialize: function(note,word,timestamp,width) {
+		this.note=note;
 		var num=(note-5)-oct;
-		var maxnum=27;
 		while (num<0) num+=12;
 		while (num>maxnum) num-=12;
-		Sprite.call(this,32,32);
+		this.num=num;
+		Sprite.call(this,width,32);
 		this.x = wordXpos[num];
 		this.y = 32;
-		this.frame = word;		
-		this.image = core.assets['images/PocketMiku.png'];
 		this.opacity = 0.0;
-		this.beginframe=Math.floor((timestamp-tempo*4/1000)*core.fps/1000)+startframe;
 		var framecount=tempo*4/1000000*fps;
 		this.downstep=dropHeight/framecount;
-		this.negidownstep=dropHeight/framecount;
-		this.negi=new Sprite(12,30);
-		this.negi.image=core.assets['images/negi.png'];
-		this.negi.x = this.x+10;
-		this.negi.y = 32;
-		this.negi.opacity=0.0;
-		this.num=num;
-		core.rootScene.addChild(this.negi);
 		core.rootScene.addChild(this);
 		//console.log("beginframe:"+this.beginframe);
 	},
-	onenterframe: function() {
-		if (this.dropping) {
-			if (this.y>=lastPosY) {
-				this.dropping=false;
-			} else {
-				this.y+=this.downstep;
-			}
-		}
-		if (core.frame==this.beginframe-frameShowWord) {
-			this.opacity = 1.0;			
-		}
-		if (core.frame==this.beginframe) {
-			//console.log("begin fire:"+core.frame);
-			this.dropping=true;
-			if (targets) targets.on(this.num);
-		}
-		if ((this.endframe!=0) && (core.frame>=this.endframe)) {
-			//console.log("end fire:"+core.frame);
-			core.rootScene.removeChild(this);
-			if (this.negi) core.rootScene.removeChild(this.negi);
-		}
-		if (core.frame==this.negibeginframe) {
-			//console.log("begin fire:"+core.frame);
-			this.negi.opacity=1.0;
-			this.negidropping=true;
-		}
-		if (this.negidropping) {
-			if (this.negi.y>=lastPosY) {
-				this.negidropping=false;
-				if (targets) targets.off(this.num);
-			} else {
-				this.negi.y+=this.negidownstep;
-			}
-		}
-	},
-	noteoff: function(timestamp) {
-		this.negibeginframe=Math.floor((timestamp-tempo*4/1000)*core.fps/1000)+startframe;
-		this.endframe=Math.floor(timestamp*core.fps/1000)+startframe;
-		var framecount=tempo*4/1000000*fps;
-	},
-	removeall: function() {
-		this.dropping=false;
-		this.negidropping=false;
-		core.rootScene.removeChild(this);
-		core.rootScene.removeChild(this.negi);
-	}
-});
-var targetObj=Class.create(Sprite, {
-	onCount:0,
-	triggerd:false,
-	blinkstate:false,
-	targetframe:0,
-	initialize: function(x,y) {
-		Sprite.call(this,32,32);
-		this.x = x;
-		this.y = y;
-		this.image = core.assets['images/akamaru.png'];
-		this.opacity = 0.0;
-		this.onCount=0;
-		this.triggered=false;
-	},
-	trigger: function(f) {
-		this.triggered=f;
-		this.opacity=1.0;
-	},
-	on: function() {
-		this.onCount++;
-		this.opacity=1.0;
-		this.targetframe=core.frame+tempo/1000000*fps/2;
-	},
-	off: function() {
-		if (this.onCount) {
-			this.onCount--;
-		} else {
-			this.opacity=0.0;
-		}
+	begin: function(timestamp) { 
+		this.beginframe=Math.floor((timestamp-tempo*4/1000)*core.fps/1000)+startframe;
+		this.showframe=this.beginframe-frameShowWord;
 	},
 	onenterframe: function() {
-		if (!this.triggered&&this.onCount) {
-			if (core.frame>this.targetframe) {
-				this.blinkstate!=this.blinkstate;
-				this.opacity=this.blinkstate?1.0:0.0;
-				this.targetframe+=tempo/1000000*fps/2;
+		if (this.beginframe!=0) {
+			if (this.dropping) {
+				if (this.y>=lastPosY) {
+					this.dropping=false;
+				} else {
+					this.y+=this.downstep;
+				}
+			}
+			if (core.frame==this.showframe) {
+				this.opacity = 1.0;			
+			}
+			if ((this.beginframe!=0) &&(core.frame==this.beginframe)) {
+				//console.log("begin fire:"+core.frame);
+				this.dropping=true;
+			}
+			if ((this.endframe!=0) && (core.frame>=this.endframe)) {
+				//console.log("end fire:"+core.frame);
+				core.rootScene.removeChild(this);
+				if (this.endfunc) this.endfunc();
 			}
 		}
 	}
 });
-var targetObjs=Class.create(Surface, {
-	target:[],
-	interval:0,
-	initialize: function() {
-		Surface.call(this,windowWidth,windowHeight);
-		for (var i=0;i<wordXpos.length;i++) {
-			this.target[i]=new targetObj(wordXpos[i],lastPosY);
-			core.rootScene.addChild(this.target[i]);			
+var WordObj=Class.create(WordObjBase, {
+	negi:undefined,
+	target:undefined,
+	initialize: function(note,word,timestamp) {
+		WordObjBase.call(this,note,word,timestamp,32);
+		this.image=core.assets['images/PocketMiku.png'];
+		this.width=32;
+		this.frame=word;
+		words[note].push(this);
+	},
+	endfunc: function() {
+		for (var i=0;i<words.length;i++) {
+			if (words[this.note][i] == this) { // may be i==0, for safety
+				words[this.note].splice(i,1);
+			}			
 		}
-	},
-	trigger: function(num,f) {
-		this.target[num].trigger(f);
-	},
-	on: function(num) {
-		this.target[num].on();
-	},
-	off: function(num) {
-		this.target[num].off();
 	}
 });
+var NegiObj=Class.create(WordObjBase, {
+	initialize: function(note,word,timestamp) {
+		WordObjBase.call(this,note,word,timestamp,12);
+		this.image=core.assets['images/negi.png'];
+		this.x+=10;
+	}
+});
+function noteon(note,word,timestamp) {
+	var negi=new NegiObj(note,word,timestamp);
+	var word=new WordObj(note,word,timestamp);
+	word.begin(timestamp);
+	var blink=new BlinkTargetObj(word.num,word.showframe);
+	word.negi=negi;
+	word.target=blink;
+};
+function noteoff(note,word,timestamp) {
+	var obj;
+	for (var i=0;i<words[note].length;i++) {
+		if (words[note][i].endframe!=0) {
+			continue;
+		}
+		obj=words[note][i];
+		break;
+	}
+	if (!obj) return;
+	obj.negi.begin(timestamp);
+	var endframe=Math.floor(timestamp*core.fps/1000)+startframe;
+	obj.endframe=endframe;
+	obj.negi.endframe=endframe;
+	obj.target.endframe=endframe;
+};
 var StartLogo=Class.create(Sprite, {
 	shown:false,
 	initialize: function(f) {
 		Sprite.call(this,450,115);
 		this.image = core.assets['images/start.png'];
 		this.x = core.rootScene.width/2-this.width/2;
-		this.y = core.rootScene.height/2-this.height/2
+		this.y = core.rootScene.height/2-this.height/2;
 		this.ontouchstart=f;
 		this.showlogo();
 	},
@@ -200,7 +192,7 @@ window.onload = function() {
 	core.preload('images/PocketMiku.png');
 	core.preload('images/start.png');
 	core.preload('images/negi.png');
-	core.preload('images/akamaru.png');
+	core.preload('images/maru.png');
 	core.preload('images/PocketMikuBG.png');
 	var isStart=false;
 
@@ -219,15 +211,20 @@ window.onload = function() {
 		var bgimage= new Sprite(windowWidth,windowHeight);
 		bgimage.image=core.assets['images/PocketMikuBG.png'];
 		core.rootScene.addChild(bgimage);
-		targets=new targetObjs();
+		for (var i=0;i<maxnum;i++) {
+			target[i]= new Sprite(32,32);
+			target[i].x=wordXpos[i];
+			target[i].y=lastPosY-1;
+			target[i].image=core.assets['images/maru.png'];
+			target[i].frame=1;
+			core.rootScene.addChild(target[i]);
+		}
 		var startLogo = new StartLogo(startFunction);
 	}
 	core.start();
 
 };
-var words=[];
 var curword=0;
-
 // parent->iframe
 function onmessage(message,timestamp) {
 	if (message[0]==0xf0) {
@@ -240,13 +237,10 @@ function onmessage(message,timestamp) {
 		curword=message[sysexhead.length];
 	} else if ((message[0]==0x90) && (message[2]!=0)) { // note on
 		var note = message[1];
-		words[note.toString(16)] = new WordObj(note,curword,timestamp);
+		noteon(note,curword,timestamp);
 	} else if ((message[0]==0x80) || (message[0]==0x90)) {
 		var note = message[1];
-		if (words[note.toString(16)]) {
-			words[note.toString(16)].noteoff(timestamp);
-			delete words[note.toString(16)];
-		}
+		noteoff(note,curword,timestamp);
 	}
 }
 function onsongend() {
