@@ -11,7 +11,7 @@
 			option.setAttribute("value", "midiInput");
 			option.appendChild(document.createTextNode(inputs[i].name));
 			document.getElementById("midiInputSelect").appendChild(option);
-			console.log('input['+i+']:'+inputs[i].name);
+			//console.log('input['+i+']:'+inputs[i].name);
 		}
 
 		for (var i = 0; i < outputs.length; i++) {
@@ -19,7 +19,7 @@
 			option.setAttribute("value", "midiOuput");
 			option.appendChild(document.createTextNode(outputs[i].name));
 			document.getElementById("midiOutputSelect").appendChild(option);
-			console.log('output['+i+']:'+outputs[i].name);
+			//console.log('output['+i+']:'+outputs[i].name);
 		}
 	};
 

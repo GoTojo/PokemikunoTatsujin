@@ -27,6 +27,17 @@ function onnoteon(note,timestamp) {
 function onnoteoff(note,timestamp) {
 	$('#iframe0')[0].contentWindow.onnoteoff(note,timestamp);	
 }
+function onshowascii(f) {
+	$('#iframe0')[0].contentWindow.onshowascii(f);		
+}
+$(window).keydown(function(e){
+	$('#iframe0')[0].contentWindow.onkbdon(e.keyCode);
+  	return false;
+});
+$(window).keyup(function(e){
+	$('#iframe0')[0].contentWindow.onkbdoff(e.keyCode);
+  	return false;
+});
 // from game.html
 function checkReady() {
 	if (smfinfo.isValid) {
@@ -134,6 +145,7 @@ function reqallnoteoff() {
 				</div>	
 				</td>
 				</tr>	
+<!-- 				
 				<tr>
 				<td><strong>操作Ascii文字を表示</strong></td>
 				<td>
@@ -145,7 +157,8 @@ function reqallnoteoff() {
 				</div>	
 				</td>
 				</tr>
-				</table>	
+ -->
+ 				</table>	
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -186,11 +199,17 @@ function reqallnoteoff() {
 	midiAccess = navigator.requestMIDIAccess({
 		sysex : true
 	}).then(onMIDISuccess, onMIDIFailure);
+</script>
+<script type='text/javascript'>
 	$('#midiOutputSelect').bind('change',function() {
 		selectMidiOutput();
 	});
 	$('#midiInputSelect').bind('change',function() {
 		selectMidiInput();
+	});
+	$('*[name="showascii"]').bind('change',function() {
+		var f=($('*[name="showascii"]:checked').val()=='on');
+		onshowascii(f);
 	});
 </script>
 </body>

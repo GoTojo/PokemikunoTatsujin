@@ -292,6 +292,11 @@ window.onload = function() {
 		scorelabel.color = 'rgba(255, 255, 255, 1.0)';
 		scorelabel.font = "20px 'Arial'";
 		core.rootScene.addChild(scorelabel);
+		for (var i=0;i<maxnum;i++) {
+			if (!asciiObj[i]) {
+				asciiObj[i]=new AsciiObj(i,acsiitbl[i]);
+			}
+		}
 	}
 	core.start();
 
@@ -359,6 +364,47 @@ function clearreservenote() {
 }
 function settempo(tempo,timestamp) {
 	tempo=tempo;
+}
+var asciiYposW=423;
+var asciiYposB=377;
+var asciiObj=[];
+var isWhite=[1,0,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,0,1,1,0,1,0,1,1,0,1];
+var acsiitbl=['Z','S','X','D','C','F','V', 'B','H','N','J','M', ',','L','.',';','/',':','_',
+				'I','9','O','0','P','@','^','['];
+var AsciiObj=Class.create(Label, {
+	initialize: function(num,code) {
+		Label.call(this,32,32);
+		this.x = wordXpos[num]+10;
+		this.y = isWhite[num]?asciiYposW:asciiYposB;
+		this.color = 'rgb(255, 255, 255)';
+		this.opacity = 0.0;
+		this.font = "18px 'Arial'";
+		this.text=code;
+		core.rootScene.addChild(this);
+	}
+});
+
+function onshowascii(f) {
+	var o=f?0.5:0.0;
+	for (var i=0;i<maxnum;i++) {
+		asciiObj[i].opacity=o;
+	}
+}
+function asciitonote(ascii) {
+	for (var i=0;i<acsiitbl.length;i++) {
+		if (acsiitbl[i]==ascii) {
+			return i+oct;
+		}
+	}
+	return -1;
+}
+function onkbdon(ascii) {
+	//var note=asciitonote(ascii);
+	//if (note>=0) noteon(note,curword,window.performance.now());
+}
+function onkbdoff(ascii) {
+	//var note=asciitonote(ascii);
+	//if (note>=0) noteoff(note,curword,window.performance.now());
 }
 // iframe->parent
 function play() {
