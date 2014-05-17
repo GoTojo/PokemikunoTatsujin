@@ -205,6 +205,7 @@ function allnoteoff() {
 	for (var i=0;i<targets.length;i++) {
 		targets[i].blinkoffnow();
 	}
+	clearreservenote();
 };
 var StartLogo=Class.create(Sprite, {
 	shown:false,
@@ -299,13 +300,17 @@ var curword=0;
 // parent->iframe
 function onmessage(message,timestamp) {
 	if (message[0]==0xf0) {
-		var sysexhead = [0xF0,0x43,0x79,0x09,0x11,0x0A,0x00];
-		if (message.length != (sysexhead.length+1+1)) return;
-		for (var i=0;i<sysexhead.length;i++) {
-			if (message[i] != sysexhead[i]) return;
+		var sysexhead39 = [0xF0,0x43,0x79,0x09,0x11,0x0A,0x00];
+		var sysexhead = [0xF0,0x43,0x79,0x09,0x00,0x50,0x11,0x0A,0x00];
+		if (message.length==(sysexhead.length+1+1)) {
+			for (var i=0;i<sysexhead.length;i++) if (message[i]!=sysexhead[i]) return;
+			if (message[sysexhead.length+1] != 0xf7) return;
+			curword=message[sysexhead.length];
+		} else if (message.length >= (sysexhead39.length+1+1)) {
+			for (var i=0;i<sysexhead39.length;i++) if (message[i]!=sysexhead39[i]) return;
+			if (message[sysexhead39.length+1] != 0xf7) return;
+			curword=message[sysexhead39.length];
 		}
-		if (message[sysexhead.length+1] != 0xf7) return;
-		curword=message[sysexhead.length];
 	} else if ((message[0]==0x90) && (message[2]!=0)) { // note on
 		var note = message[1];
 		noteon(note,curword,timestamp);
@@ -317,6 +322,40 @@ function onmessage(message,timestamp) {
 function onsongend() {
 	playing=false;
 	if (endLogo) endLogo.showlogo();
+}
+var reserveNote=[];
+var ReserveMidiEvent=Class.create(Node, {
+	initialize: function(note,timestamp,fison) {
+		Node.call(this);
+		core.rootScene.addChild(this);
+		var time=timestamp-window.performance.now();
+		if (time==0) { fison?noteon(note):noteoff(note); }
+		else {
+			var frame=time/1000*core.fps;
+			this.tl.delay(frame).then(function() {
+				fison?noteon(note):noteoff(note);
+				core.rootScene.removeChild(this);
+				for (var i=0;i<reserveNote.length;i++) {
+					if (reserveNote[i]==this) {
+						reserveNote.splice(i,1);
+					}
+				}
+			});
+			core.rootScene.addChild(this);
+		}
+	}
+});
+function onnoteon(note,timestamp) {
+	reserveNote.push(new ReserveMidiEvent(note,timestamp,true));
+}
+function onnoteoff(note,timestamp) {
+	reserveNote.push(new ReserveMidiEvent(note,timestamp,false));
+}
+function clearreservenote() {
+	for (var i=0;i<reserveNote.length;i++) {
+		core.rootScene.removeChild(reserveNote[i]);
+	}
+	reserveNote=[];
 }
 function settempo(tempo,timestamp) {
 	tempo=tempo;

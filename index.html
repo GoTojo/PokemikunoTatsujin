@@ -11,6 +11,7 @@
 <script src='js/midi.js'></script>
 <script src='js/smfplayer.js'></script>
 <script type='text/javascript'>
+// to game.html
 function onmessage(message,timestamp) {
 	$('#iframe0')[0].contentWindow.onmessage(message,timestamp);
 }
@@ -20,6 +21,13 @@ function ontempochange(tempo,timestamp) {
 function onsongend() {
 	$('#iframe0')[0].contentWindow.onsongend();	
 }
+function onnoteon(note,timestamp) {
+	$('#iframe0')[0].contentWindow.onnoteon(note,timestamp);	
+}
+function onnoteoff(note,timestamp) {
+	$('#iframe0')[0].contentWindow.onnoteoff(note,timestamp);	
+}
+// from game.html
 function checkReady() {
 	if (smfinfo.isValid) {
 		return true;
@@ -27,13 +35,15 @@ function checkReady() {
 		$('#smfalert').modal('show');
 	}
 }
-$('#midiOutputSelect').bind('change',function() {
-	selectMidiOutput();
-});
-
-$('#midiInputSelect').bind('change',function() {
-	selectMidiInput();
-});
+function reqnoteon(note) {
+	if (output) output.send([0x90,note,0x7f]);
+}
+function reqnoteoff(note) {
+	if (output) output.send([0x80,note,0x40]);
+}
+function reqallnoteoff() {
+	allnoteoff();
+}
 </script>
 </head>
 <body>
@@ -70,21 +80,72 @@ $('#midiInputSelect').bind('change',function() {
 				<h4 class="modal-title">設定</h4>
 			</div>
 			<div class="modal-body">
-				<div id="divMidiInSelWarning"></div>
-				<select id="midiInputSelect" type= "text" class="form-control input"　onchange="selectMidiInput()">
-					<option value="1">MIDI INポートの選択</option>
-				</select>
-				<br/>
-				<select id="midiOutputSelect" type="text"  class="form-control input"　onchange="selectMidiOutput()">
-					<option value="1">MIDI OUTポートの選択</option>
-				</select>
-				<br>
-				<p>
-				SMFの選択<br>
+				<div class="form-group">
+					<select class="form-control" id='midiInputSelect'>
+						<option>MIDI INポートの選択</option>
+					</select>
+				</div>
+ 				<br>
+				<div class="form-group">
+					<select class="form-control" id='midiOutputSelect'>
+						<option>MIDI OUTポートの選択</option>
+					</select>
+				</div>
+ 				<br>
+				<table class='table'>
+				<tr>
+				<td><strong>SMFの選択</strong></td>
+				<td>
 				<form aria-hidden="true">
 					<input type="file" id="filedialog" name="file" onchange="onSelectedFile()" accept="audio/mid"/>
 				</form>
-				</p>
+				<td>
+				</td>
+				<tr>
+				<td><strong>オートメロディ</strong></td>
+				<td>
+				<div class="radio-inline">
+					<label><input type="radio" name="automelody" value="on">on</label>
+				</div>
+				<div class="radio-inline">
+					<label><input type="radio" name="automelody" value="off" checked>off</label>
+				</div>
+				</td>
+				</tr>
+				<tr>
+				<td><strong>外部コントローラー</strong></td>
+				<td>
+				<div class="radio-inline" id='extcontroller'>
+					<label><input type="radio" name="extcontroller" value="nsx39" checked>NSX39</label>
+				</div>
+				<div class="radio-inline">
+					<label><input type="radio" name="extcontroller" value="midikeyboard">MIDI Keyboard</label>
+				</div>	
+				</td>
+				</tr>	
+				<tr>
+				<td><strong>eVY1モード</strong><br></td>
+				<td>
+				<div class="radio-inline" id='evy1mode'>
+					<label><input type="radio" name="evy1mode" value="on" checked>on</label>
+				</div>
+				<div class="radio-inline">
+					<label><input type="radio" name="evy1mode" value="off">off</label>
+				</div>	
+				</td>
+				</tr>	
+				<tr>
+				<td><strong>操作Ascii文字を表示</strong></td>
+				<td>
+				<div class="radio-inline" id='showascii'>
+					<label><input type="radio" name="showascii" value="on">on</label>
+				</div>
+				<div class="radio-inline">
+					<label><input type="radio" name="showascii" value="off" checked>off</label>
+				</div>	
+				</td>
+				</tr>
+				</table>	
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -125,6 +186,12 @@ $('#midiInputSelect').bind('change',function() {
 	midiAccess = navigator.requestMIDIAccess({
 		sysex : true
 	}).then(onMIDISuccess, onMIDIFailure);
+	$('#midiOutputSelect').bind('change',function() {
+		selectMidiOutput();
+	});
+	$('#midiInputSelect').bind('change',function() {
+		selectMidiInput();
+	});
 </script>
 </body>
 </html>

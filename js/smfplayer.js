@@ -435,9 +435,10 @@ function getNext() {
 				break;
 			}
 			if (output) {
-				//if ((data.message[0]!=0x90)&&(data.message[0]!=0x80)) {
+				var automelody=($('*[name="automelody"]:checked').val()=='on');
+				if (((data.message[0]!=0x90)&&(data.message[0]!=0x80))||automelody) {
 					output.send(data.message,data.timestamp);
-				//}
+				}
 			}
 			i++;
 		}

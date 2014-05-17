@@ -5,7 +5,7 @@
 		var inputs = midiAccess.inputs();
 		var outputs = midiAccess.outputs();
 
-		for ( i = 0; i < inputs.length; i++) {
+		for (var i = 0; i < inputs.length; i++) {
 			var option = document.createElement("option");
 
 			option.setAttribute("value", "midiInput");
@@ -14,7 +14,7 @@
 			console.log('input['+i+']:'+inputs[i].name);
 		}
 
-		for ( i = 0; i < outputs.length; i++) {
+		for (var i = 0; i < outputs.length; i++) {
 			var option = document.createElement("option");
 			option.setAttribute("value", "midiOuput");
 			option.appendChild(document.createTextNode(outputs[i].name));
@@ -62,5 +62,13 @@
 	};
 
 	function onMIDIMessage(e) {
-		console.log(e);
+		//console.log(e);
+		if (e.data.length!=3) return;
+		if (((e.data[0]==0x90)&&(e.data[2]==0x00))||(e.data[0]=0x80)) { // note off
+			onnoteoff(e.data[1],e.timestamp);
+			if (output) output.send(e.data,e.timestamp);
+		} else if (e.data[0]=0x90) { // note on
+			onnoteon(e.data[1],e.timestamp);
+			if (output) output.send(e.data,e.timestamp);
+		}
 	}
