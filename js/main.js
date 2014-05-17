@@ -9,7 +9,7 @@ var tempo=60000000/120; //BPM=120
 var fps=30;
 var frameShowWord=15;
 var wordXpos=[];
-var target=[];
+var targets=[];
 var maxnum=27;
 var words=[];
 (function() {
@@ -35,32 +35,33 @@ var dropStartPosY=scoreAreaHeight;
 var lastPosY=windowHeight-32;
 var dropHeight=lastPosY-dropStartPosY;
 var BlinkTargetObj=Class.create(Sprite, {
-	showframe:0,
-	endframe:0,
+	blink:0,
 	framecount:0,
-	initialize: function(num,showframe) {
+	initialize: function(num) {
 		Sprite.call(this,32,32);
 		this.x=wordXpos[num];
 		this.y=lastPosY-1;
 		this.image=core.assets['images/maru.png'];
-		this.frame=2;
-		this.opacity = 0.0;
-		this.showframe=showframe;
-		this.framecount=Math.floor(tempo/2/1000000*core.fps);
+		this.frame=1;
 		core.rootScene.addChild(this);
 	},
+	blinkon: function() {
+		this.framecount=Math.floor(tempo/2/1000000*core.fps);
+		this.blink++;
+	},
+	blinkoff: function() {
+		if (this.blink) this.blink--;
+		if (this.blink==0) this.frame=1;
+	},
 	onenterframe: function() {
-		if (core.frame>this.showframe) {
+		if (this.blink) {
 			if ((core.frame%this.framecount)==0) {
-				if (this.opacity) { 
-					this.opacity=0.0; 
+				if (this.frame==1) { 
+					this.frame=2; 
 				} else {
-					this.opacity=1.0;
+					this.frame=1;
 				} 
 			}
-		}
-		if ((this.endframe!=0) && (core.frame>=this.endframe)) {
-			core.rootScene.removeChild(this);
 		}
 	}
 });
@@ -106,6 +107,7 @@ var WordObjBase=Class.create(Sprite, {
 			if ((this.beginframe!=0) &&(core.frame==this.beginframe)) {
 				//console.log("begin fire:"+core.frame);
 				this.dropping=true;
+				if (this.beginfunc) this.beginfunc();
 			}
 			if ((this.endframe!=0) && (core.frame>=this.endframe)) {
 				//console.log("end fire:"+core.frame);
@@ -116,8 +118,6 @@ var WordObjBase=Class.create(Sprite, {
 	}
 });
 var WordObj=Class.create(WordObjBase, {
-	negi:undefined,
-	target:undefined,
 	initialize: function(note,word,timestamp) {
 		WordObjBase.call(this,note,word,timestamp,32);
 		this.image=core.assets['images/PocketMiku.png'];
@@ -125,12 +125,16 @@ var WordObj=Class.create(WordObjBase, {
 		this.frame=word;
 		words[note].push(this);
 	},
+	beginfunc: function() {
+		targets[this.num].blinkon();
+	},
 	endfunc: function() {
 		for (var i=0;i<words.length;i++) {
 			if (words[this.note][i] == this) { // may be i==0, for safety
 				words[this.note].splice(i,1);
 			}			
 		}
+		targets[this.num].blinkoff();
 	}
 });
 var NegiObj=Class.create(WordObjBase, {
@@ -144,9 +148,7 @@ function noteon(note,word,timestamp) {
 	var negi=new NegiObj(note,word,timestamp);
 	var word=new WordObj(note,word,timestamp);
 	word.begin(timestamp);
-	var blink=new BlinkTargetObj(word.num,word.showframe);
 	word.negi=negi;
-	word.target=blink;
 };
 function noteoff(note,word,timestamp) {
 	var obj;
@@ -162,7 +164,6 @@ function noteoff(note,word,timestamp) {
 	var endframe=Math.floor(timestamp*core.fps/1000)+startframe;
 	obj.endframe=endframe;
 	obj.negi.endframe=endframe;
-	obj.target.endframe=endframe;
 };
 var StartLogo=Class.create(Sprite, {
 	shown:false,
@@ -212,12 +213,7 @@ window.onload = function() {
 		bgimage.image=core.assets['images/PocketMikuBG.png'];
 		core.rootScene.addChild(bgimage);
 		for (var i=0;i<maxnum;i++) {
-			target[i]= new Sprite(32,32);
-			target[i].x=wordXpos[i];
-			target[i].y=lastPosY-1;
-			target[i].image=core.assets['images/maru.png'];
-			target[i].frame=1;
-			core.rootScene.addChild(target[i]);
+			targets[i]=new BlinkTargetObj(i);
 		}
 		var startLogo = new StartLogo(startFunction);
 	}
