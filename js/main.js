@@ -45,8 +45,10 @@ var TargetObj=Class.create(Sprite, {
 	oncount:0,
 	touched:false,
 	point:pointHit,
+	num:0,
 	initialize: function(num) {
 		Sprite.call(this,32,32);
+		this.num=num;
 		this.x=wordXpos[num];
 		this.y=lastPosY-1;
 		this.image=core.assets['images/maru.png'];
@@ -69,9 +71,11 @@ var TargetObj=Class.create(Sprite, {
 	},
 	ontouchstart: function() {
 		this.touched=true;
+		reqnoteon(this.num+oct+5);
 	},
 	ontouchend: function() {
 		this.touched=false;
+		reqnoteoff(this.num+oct+5);
 	},
 	onenterframe: function() {
 		if (this.blink) {
@@ -206,6 +210,7 @@ function allnoteoff() {
 		targets[i].blinkoffnow();
 	}
 	clearreservenote();
+	reqallnoteoff();
 };
 var StartLogo=Class.create(Sprite, {
 	shown:false,
@@ -414,7 +419,17 @@ function play() {
 function stop() {
 	window.parent.stop();
 }
+function reqnoteon(note) {
+	window.parent.reqnoteon(note);
+}
+function reqnoteoff(note) {
+	window.parent.reqnoteoff(note);
+}
+function reqallnoteoff() {
+	window.parent.reqallnoteoff();
+}
 
+// utility
 function rand(n) {
 	return Math.floor(Math.random()*(n+1));
 }
