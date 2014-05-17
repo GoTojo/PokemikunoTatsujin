@@ -53,6 +53,10 @@ var BlinkTargetObj=Class.create(Sprite, {
 		if (this.blink) this.blink--;
 		if (this.blink==0) this.frame=1;
 	},
+	blinkoffnow: function() {
+		this.blink=0;
+		this.frame=1;
+	},
 	onenterframe: function() {
 		if (this.blink) {
 			if ((core.frame%this.framecount)==0) {
@@ -165,6 +169,19 @@ function noteoff(note,word,timestamp) {
 	obj.endframe=endframe;
 	obj.negi.endframe=endframe;
 };
+function allnoteoff() {
+	for (var note=0;note<words.length;note++) {
+		for (var i=0;i<words[note].length;i++) {
+			var wordobj=words[note][i];
+			core.rootScene.removeChild(wordobj.negi);
+			core.rootScene.removeChild(wordobj);
+		}
+		words[note] = [];
+	}
+	for (var i=0;i<targets.length;i++) {
+		targets[i].blinkoffnow();
+	}
+};
 var StartLogo=Class.create(Sprite, {
 	shown:false,
 	initialize: function(f) {
@@ -200,6 +217,7 @@ window.onload = function() {
 	core.onload = function() {
 		var startFunction = function() {
 			if (window.parent.checkReady()) {
+				allnoteoff();
 				startframe=core.frame;
 				this.hidelogo();
 				play();
@@ -207,6 +225,7 @@ window.onload = function() {
 		};
 		core.rootScene.ontouchstart = function () {
 			stop();
+			allnoteoff();
 			startLogo.showlogo();
 		}
 		var bgimage= new Sprite(windowWidth,windowHeight);
