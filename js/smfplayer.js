@@ -363,14 +363,13 @@ function getNext() {
 		playerinfo.playing = false;
 		allnoteoff();
 	}
-	var dequeueTimer;
 	function play() {
 		if (!smfinfo.isValid) return;
 		playerinfo.starttime = window.performance.now();
 		playerinfo.playing = true;
 		doInterval();
 		playerinfo.timer = setInterval('doInterval()',playerinfo.buffer);
-		timer4dequeue = setInterval('doDequeue()',playerinfo.buffer);
+		dequeueTimer = setInterval('doDequeue()',playerinfo.buffer);
 		return playerinfo.starttime;
 	}
 	function gettime(tick) {
