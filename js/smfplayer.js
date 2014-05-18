@@ -420,6 +420,21 @@ function getNext() {
 		clearInterval(dequeueTimer);
 		onsongend();
 	}
+	var sysexhead39 = [0xF0,0x43,0x79,0x09,0x11,0x0A,0x00];
+	var sysexhead = [0xF0,0x43,0x79,0x09,0x00,0x50,0x11,0x0A,0x00];
+	function getWord(message) {
+		var word=-1;
+		if (message.length==(sysexhead.length+1+1)) {
+			for (var i=0;i<sysexhead.length;i++) if (message[i]!=sysexhead[i]) return -1;
+			if (message[sysexhead.length+1] != 0xf7) return '';
+			word=message[sysexhead.length];
+		} else if (message.length==(sysexhead39.length+1+1)) {
+			for (var i=0;i<sysexhead39.length;i++) if (message[i]!=sysexhead39[i]) return -1;
+			if (message[sysexhead39.length+1] != 0xf7) return -1;
+			word=message[sysexhead39.length];
+		}
+		return word;
+	}
 	function doDequeue() {
 		var currenttime = window.performance.now();
 		var targettime = currenttime+playerinfo.buffer;
@@ -436,7 +451,22 @@ function getNext() {
 			}
 			if (output) {
 				var automelody=($('*[name="automelody"]:checked').val()=='on');
-				if (((data.message[0]!=0x90)&&(data.message[0]!=0x80))||automelody) {
+				if (data.message[0]==0xf0) {
+					var word=getWord(data.message);
+					if (word<0) {
+						output.send(data.message,data.timestamp);
+					} else {
+						var buf=[];
+						if (evy1mode) {
+							buf = sysexhead.concat();
+						} else {
+							buf = sysexhead39.concat();
+						}
+						buf.push(word);
+						buf.push(0xf7);
+						output.send(buf,data.timestamp);						
+					}
+				} else if (((data.message[0]!=0x90)&&(data.message[0]!=0x80))||automelody) {
 					output.send(data.message,data.timestamp);
 				}
 			}
