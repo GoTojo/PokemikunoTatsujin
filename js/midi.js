@@ -64,11 +64,11 @@
 	function onMIDIMessage(e) {
 		//console.log(e);
 		if (e.data.length!=3) return;
-		if (((e.data[0]==0x90)&&(e.data[2]==0x00))||(e.data[0]=0x80)) { // note off
-			onnoteoff(e.data[1],e.timestamp);
-			if (output) output.send(e.data,e.timestamp);
-		} else if (e.data[0]=0x90) { // note on
-			onnoteon(e.data[1],e.timestamp);
-			if (output) output.send(e.data,e.timestamp);
+		if (((e.data[0]==0x90)&&(e.data[2]==0x00))||(e.data[0]==0x80)) { // note off
+			onnoteoff(e.data[1],window.performance.now());
+			if (output) output.send(e.data);
+		} else if (e.data[0]==0x90) { // note on
+			onnoteon(e.data[1],window.performance.now());
+			if (output) output.send(e.data);
 		}
 	}

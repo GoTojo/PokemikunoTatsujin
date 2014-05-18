@@ -77,6 +77,8 @@ var TargetObj=Class.create(Sprite, {
 		this.touched=false;
 		reqnoteoff(this.num+oct+5);
 	},
+	midinoteon: function() {this.touched=true;},
+	midinoteoff: function() {this.touched=false;},
 	onenterframe: function() {
 		if (this.blink) {
 			if ((core.frame%this.framecount)==0) {
@@ -93,6 +95,12 @@ var TargetObj=Class.create(Sprite, {
 		}
 	}
 });
+function notetonum(note) {
+	var num=(note-5)-oct;
+	while (num<0) num+=12;
+	while (num>maxnum) num-=12;
+	return num;
+}
 var WordObjBase=Class.create(Sprite, {
 	beginframe:0,
 	showframe:0,
@@ -103,12 +111,9 @@ var WordObjBase=Class.create(Sprite, {
 	note:0,
 	initialize: function(note,word,timestamp,width) {
 		this.note=note;
-		var num=(note-5)-oct;
-		while (num<0) num+=12;
-		while (num>maxnum) num-=12;
-		this.num=num;
+		this.num=notetonum(note);
 		Sprite.call(this,width,32);
-		this.x = wordXpos[num];
+		this.x = wordXpos[this.num];
 		this.y = 32;
 		this.opacity = 0.0;
 		this.touchEnabled = false;
@@ -343,7 +348,9 @@ var ReserveMidiEvent=Class.create(Node, {
 		else {
 			var frame=time/1000*core.fps;
 			this.tl.delay(frame).then(function() {
-				fison?noteon(note):noteoff(note);
+				var target=targets[notetonum(note)];
+				fison?target.midinoteon():target.midinoteoff();
+				//fison?target.ontouchstart():target.ontouchend();
 				core.rootScene.removeChild(this);
 				for (var i=0;i<reserveNote.length;i++) {
 					if (reserveNote[i]==this) {
@@ -356,10 +363,12 @@ var ReserveMidiEvent=Class.create(Node, {
 	}
 });
 function onnoteon(note,timestamp) {
-	reserveNote.push(new ReserveMidiEvent(note,timestamp,true));
+	//reserveNote.push(new ReserveMidiEvent(note,timestamp,true));
+	targets[notetonum(note)].midinoteon();
 }
 function onnoteoff(note,timestamp) {
-	reserveNote.push(new ReserveMidiEvent(note,timestamp,false));
+	//reserveNote.push(new ReserveMidiEvent(note,timestamp,false));
+	targets[notetonum(note)].midinoteoff();
 }
 function clearreservenote() {
 	for (var i=0;i<reserveNote.length;i++) {
@@ -403,6 +412,10 @@ function asciitonote(ascii) {
 	}
 	return -1;
 }
+//
+// enchant.jsにはキーボードショートカットがある?
+// コンフリクトしてるっぽい
+//
 function onkbdon(ascii) {
 	//var note=asciitonote(ascii);
 	//if (note>=0) noteon(note,curword,window.performance.now());
