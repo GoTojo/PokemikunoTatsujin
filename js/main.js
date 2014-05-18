@@ -63,8 +63,8 @@ var TargetObj=Class.create(Sprite, {
 		if (this.blink) this.blink--;
 		if (this.blink==0) this.frame=1;
 	},
-	noteon: function() { this.oncount++; this.point=pointHit; },
-	noteoff: function() { if (this.oncount) this.oncount--; },
+	noteon: function() { this.oncount++; this.point=pointHit;},
+	noteoff: function() { if (this.oncount) this.oncount--;},
 	blinkoffnow: function() {
 		this.blink=0;
 		this.frame=1;

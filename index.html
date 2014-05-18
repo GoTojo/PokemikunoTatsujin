@@ -11,6 +11,8 @@
 <script src='js/midi.js'></script>
 <script src='js/smfplayer.js'></script>
 <script type='text/javascript'>
+var evy1mode=false;
+var nsx39mode=true;
 // to game.html
 function onmessage(message,timestamp) {
 	$('#iframe0')[0].contentWindow.onmessage(message,timestamp);
@@ -138,10 +140,10 @@ function reqallnoteoff() {
 				<td><strong>eVY1モード</strong><br></td>
 				<td>
 				<div class="radio-inline" id='evy1mode'>
-					<label><input type="radio" name="evy1mode" value="on" checked>on</label>
+					<label><input type="radio" name="evy1mode" value="on">on</label>
 				</div>
 				<div class="radio-inline">
-					<label><input type="radio" name="evy1mode" value="off">off</label>
+					<label><input type="radio" name="evy1mode" value="off" checked>off</label>
 				</div>	
 				</td>
 				</tr>	
@@ -206,6 +208,13 @@ function reqallnoteoff() {
 	});
 	$('#midiInputSelect').bind('change',function() {
 		selectMidiInput();
+	});
+	$('*[name="evy1mode"]').bind('change',function() {
+		evy1mode=($('*[name="evy1mode"]:checked').val()=='on');
+		});
+	$('*[name="extcontroller"]').bind('change',function() {
+		nsx39mode=($('*[name="showascii"]:checked').val()=='nsx39');
+		onshowascii(f);
 	});
 	$('*[name="showascii"]').bind('change',function() {
 		var f=($('*[name="showascii"]:checked').val()=='on');
