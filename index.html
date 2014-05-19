@@ -214,7 +214,6 @@ function reqallnoteoff() {
 		});
 	$('*[name="extcontroller"]').bind('change',function() {
 		nsx39mode=($('*[name="showascii"]:checked').val()=='nsx39');
-		onshowascii(f);
 	});
 	$('*[name="showascii"]').bind('change',function() {
 		var f=($('*[name="showascii"]:checked').val()=='on');

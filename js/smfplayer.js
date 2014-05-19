@@ -348,6 +348,7 @@ function getNext() {
 	function reset() {
 		songinfo.ptr = songinfo.offsetTop;
 		playerinfo.init();
+		preloadbuf=[];
 		//progressbar.value = 0;
 	}
 	var dequeueTimer;
@@ -355,6 +356,7 @@ function getNext() {
 		clearInterval(playerinfo.timer);
 		clearInterval(dequeueTimer);
 		reset();
+		preloadbuf=[];
 		allnoteoff();
 	}
 	function pause() {

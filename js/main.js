@@ -376,8 +376,8 @@ function clearreservenote() {
 	}
 	reserveNote=[];
 }
-function settempo(tempo,timestamp) {
-	tempo=tempo;
+function settempo(newtempo,timestamp) {
+	tempo=newtempo;
 }
 var asciiYposW=423;
 var asciiYposB=377;
