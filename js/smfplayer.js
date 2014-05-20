@@ -1,3 +1,5 @@
+// WebMIDI SMF player
+// Copyright 2014 gotojo All Rights Reserved. 
 	var filereader = new FileReader();
 	var file = null;
 	//var progressbar = document.getElementById("progress");
@@ -423,14 +425,15 @@ function getNext() {
 		onsongend();
 	}
 	var sysexhead39 = [0xF0,0x43,0x79,0x09,0x11,0x0A,0x00];
-	var sysexhead = [0xF0,0x43,0x79,0x09,0x00,0x50,0x11,0x0A,0x00];
+	var sysexhead = [0xF0,0x43,0x79,0x09,0x00,0x50,0x10];
 	function getWord(message) {
 		var word=-1;
-		if (message.length==(sysexhead.length+1+1)) {
-			for (var i=0;i<sysexhead.length;i++) if (message[i]!=sysexhead[i]) return -1;
-			if (message[sysexhead.length+1] != 0xf7) return '';
-			word=message[sysexhead.length];
-		} else if (message.length==(sysexhead39.length+1+1)) {
+		// if (message.length==(sysexhead.length+1+1)) {
+		// 	for (var i=0;i<sysexhead.length;i++) if (message[i]!=sysexhead[i]) return -1;
+		// 	if (message[sysexhead.length+1] != 0xf7) return '';
+		// 	word=message[sysexhead.length];
+		// } else 
+		if (message.length==(sysexhead39.length+1+1)) {
 			for (var i=0;i<sysexhead39.length;i++) if (message[i]!=sysexhead39[i]) return -1;
 			if (message[sysexhead39.length+1] != 0xf7) return -1;
 			word=message[sysexhead39.length];
@@ -461,10 +464,12 @@ function getNext() {
 						var buf=[];
 						if (evy1mode) {
 							buf = sysexhead.concat();
+							for (var i=0; i<nsx1tbl[word].length;i++) buf.push(nsx1tbl[word].charCodeAt(i));
+							buf.push(0);
 						} else {
 							buf = sysexhead39.concat();
+							buf.push(word);
 						}
-						buf.push(word);
 						buf.push(0xf7);
 						output.send(buf,data.timestamp);						
 					}

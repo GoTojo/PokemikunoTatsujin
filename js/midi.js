@@ -1,3 +1,5 @@
+// WebMIDI main
+// Copyright 2014 gotojo All Rights Reserved. 
 var midiAccess = null;
 var output = null;
 

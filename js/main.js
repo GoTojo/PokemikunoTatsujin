@@ -1,3 +1,5 @@
+// enchant.js main.js
+// Copyright 2014 gotojo All Rights Reserved. 
 enchant();
 
 var core;
@@ -320,9 +322,9 @@ function onmessage(message,timestamp) {
 		var sysexhead39 = [0xF0,0x43,0x79,0x09,0x11,0x0A,0x00];
 		var sysexhead = [0xF0,0x43,0x79,0x09,0x00,0x50,0x11,0x0A,0x00];
 		if (message.length==(sysexhead.length+1+1)) {
-			for (var i=0;i<sysexhead.length;i++) if (message[i]!=sysexhead[i]) return;
-			if (message[sysexhead.length+1] != 0xf7) return;
-			curword=message[sysexhead.length];
+			//for (var i=0;i<sysexhead.length;i++) if (message[i]!=sysexhead[i]) return;
+			//if (message[sysexhead.length+1] != 0xf7) return;
+			//curword=message[sysexhead.length];
 		} else if (message.length >= (sysexhead39.length+1+1)) {
 			for (var i=0;i<sysexhead39.length;i++) if (message[i]!=sysexhead39[i]) return;
 			if (message[sysexhead39.length+1] != 0xf7) return;
