@@ -227,6 +227,27 @@ function allnoteoff() {
 	clearreservenote();
 	reqallnoteoff();
 };
+var reqSMF;
+var ReqSMF=Class.create(Label, {
+	initialize: function(f) {
+		Label.call(this,20,20);
+		var startx=core.rootScene.width;
+		var movex=core.rootScene.width+this.width
+		this.x = startx;
+		this.y = 50;
+		this.color = 'rgba(255, 255, 255, 1.0)';
+		this.font = "20px 'Arial'";
+		this.text='曲を選んでね';
+		this.tl.moveBy(movex*(-1), 0, 300).moveBy(movex,0,0).loop();
+		this.showlogo();
+	},
+	hidelogo: function() {
+		core.rootScene.removeChild(this);
+	},
+	showlogo: function() {
+		core.rootScene.addChild(this);
+	}
+});
 var StartLogo=Class.create(Sprite, {
 	shown:false,
 	initialize: function(f) {
@@ -306,6 +327,7 @@ window.onload = function() {
 		for (var i=0;i<maxnum;i++) {
 			targets[i]=new TargetObj(i);
 		}
+		reqSMF = new ReqSMF();
 		var startLogo = new StartLogo(startFunction);
 		endLogo = new EndLogo(startFunction.showlogo);
 		var scorelabel = new Label('score:000000');
@@ -319,7 +341,6 @@ window.onload = function() {
 		}
 	}
 	core.start();
-
 };
 var curword=0;
 // parent->iframe
@@ -388,6 +409,12 @@ function clearreservenote() {
 }
 function settempo(newtempo,timestamp) {
 	tempo=newtempo;
+}
+function onsmfready(newtempo,timestamp) {
+	if (reqSMF) {
+		reqSMF.hidelogo();
+		delete reqSMF;
+	}
 }
 var asciiYposW=423;
 var asciiYposB=377;

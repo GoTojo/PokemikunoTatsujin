@@ -33,6 +33,9 @@ function onnoteoff(note,timestamp) {
 function onshowascii(f) {
 	$('#iframe0')[0].contentWindow.onshowascii(f);		
 }
+function onsmfready() {
+	$('#iframe0')[0].contentWindow.onsmfready();		
+}
 $(window).keydown(function(e){
 	$('#iframe0')[0].contentWindow.onkbdon(e.keyCode);
   	return false;

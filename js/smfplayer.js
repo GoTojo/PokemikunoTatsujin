@@ -105,6 +105,7 @@
 		smfinfo.tracksize = (buf[ptr++]<<24)+(buf[ptr++]<<16)+(buf[ptr++]<<8)+buf[ptr++];
 		songinfo.ptr = ptr;
 		smfinfo.isValid = true;
+		onsmfready();
 		//console.log("validSMF");
 		//console.log("tracksize:"+smfinfo.tracksize);
 		//progressbar.max = smfinfo.tracksize;
