@@ -79,15 +79,18 @@ function nsx32tomidi(note,pb) {
 	return note+i-13;
 }
 var pb=0;
+var cur39note=-1;
 function onMIDIMessage(e) {
 	//console.log(e);
 	if (nsx39mode) {
 		if (e.data[0]==0xe0) {
 			pb=(e.data[2]<<7)+e.data[1]-(0x2000);
 		} else if (e.data[0]==0x90) {
-			onnoteon(nsx32tomidi(e.data[1],pb),window.performance.now());
+			cur39note=nsx32tomidi(e.data[1],pb);
+			onnoteon(cur39note,window.performance.now());
 		} else if (e.data[0]==0x80) {
-			onnoteoff(nsx32tomidi(e.data[1],pb),window.performance.now());
+			onnoteoff(cur39note,window.performance.now());
+			cur39note=-1;
 		}
 	} else {
 		if (((e.data[0]==0x90)&&(e.data[2]==0x00))||(e.data[0]==0x80)) { // note off

@@ -79,9 +79,14 @@ var TargetObj=Class.create(Sprite, {
 		this.touched=false;
 		reqnoteoff(this.num+oct+5);
 	},
-	midinoteon: function() {this.touched=true;},
-	midinoteoff: function() {this.touched=false;},
+	midinoteon: function() {
+		this.touched=true;
+	},
+	midinoteoff: function() {
+		this.touched=false;
+	},
 	onenterframe: function() {
+		//this.backgroundColor=this.touched?'rgba(255, 255, 255, 1.0)':'rgba(0, 0, 0, 1.0)';
 		if (this.blink) {
 			if ((core.frame%this.framecount)==0) {
 				if (this.frame==1) { 
@@ -215,6 +220,7 @@ function allnoteoff() {
 		words[note] = [];
 	}
 	for (var i=0;i<targets.length;i++) {
+		targets[i].oncount=0;
 		targets[i].blinkoffnow();
 		targets[i].midinoteoff();
 	}
