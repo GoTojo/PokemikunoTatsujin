@@ -105,7 +105,7 @@ var TargetObj=Class.create(Sprite, {
 function notetonum(note) {
 	var num=(note-5)-oct;
 	while (num<0) num+=12;
-	while (num>maxnum) num-=12;
+	while (num>=maxnum) num-=12;
 	return num;
 }
 var WordObjBase=Class.create(Sprite, {
