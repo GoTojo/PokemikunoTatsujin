@@ -227,9 +227,9 @@ function allnoteoff() {
 	clearreservenote();
 	reqallnoteoff();
 };
-var reqSMF;
-var ReqSMF=Class.create(Label, {
-	initialize: function(f) {
+var reqSMF=null;
+var infoText=Class.create(Label, {
+	initialize: function(str) {
 		Label.call(this,20,20);
 		var startx=core.rootScene.width;
 		var movex=core.rootScene.width+this.width
@@ -237,14 +237,14 @@ var ReqSMF=Class.create(Label, {
 		this.y = 50;
 		this.color = 'rgba(255, 255, 255, 1.0)';
 		this.font = "20px 'Arial'";
-		this.text='曲を選んでね';
+		this.text=str;
 		this.tl.moveBy(movex*(-1), 0, 300).moveBy(movex,0,0).loop();
-		this.showlogo();
+		this.showtext();
 	},
-	hidelogo: function() {
+	hidetext: function() {
 		core.rootScene.removeChild(this);
 	},
-	showlogo: function() {
+	showtext: function() {
 		core.rootScene.addChild(this);
 	}
 });
@@ -304,6 +304,7 @@ window.onload = function() {
 				allnoteoff();
 				starttime=window.performance.now();
 				this.hidelogo();
+				if (reqSMF) { reqSMF.hidetext(); reqSMF=null; }
 				score=0;
 				playing=true;
 				play();
@@ -327,7 +328,7 @@ window.onload = function() {
 		for (var i=0;i<maxnum;i++) {
 			targets[i]=new TargetObj(i);
 		}
-		reqSMF = new ReqSMF();
+		reqSMF = new infoText('曲を選んでね');
 		var startLogo = new StartLogo(startFunction);
 		endLogo = new EndLogo(startFunction.showlogo);
 		var scorelabel = new Label('score:000000');
@@ -412,8 +413,8 @@ function settempo(newtempo,timestamp) {
 }
 function onsmfready(newtempo,timestamp) {
 	if (reqSMF) {
-		reqSMF.hidelogo();
-		delete reqSMF;
+		reqSMF.hidetext();
+		reqSMF=null;
 	}
 }
 var asciiYposW=423;
