@@ -227,6 +227,7 @@ function allnoteoff() {
 	clearreservenote();
 	reqallnoteoff();
 };
+var waitinfo=null;
 var reqSMF=null;
 var infoText=Class.create(Label, {
 	initialize: function(str) {
@@ -239,7 +240,6 @@ var infoText=Class.create(Label, {
 		this.font = "20px 'Arial'";
 		this.text=str;
 		this.tl.moveBy(movex*(-1), 0, 300).moveBy(movex,0,0).loop();
-		this.showtext();
 	},
 	hidetext: function() {
 		core.rootScene.removeChild(this);
@@ -304,6 +304,7 @@ window.onload = function() {
 				allnoteoff();
 				starttime=window.performance.now();
 				this.hidelogo();
+				waitinfo.showtext();
 				if (reqSMF) { reqSMF.hidetext(); reqSMF=null; }
 				score=0;
 				playing=true;
@@ -329,6 +330,8 @@ window.onload = function() {
 			targets[i]=new TargetObj(i);
 		}
 		reqSMF = new infoText('曲を選んでね');
+		reqSMF.showtext();
+		waitinfo = new infoText('レッツゴー');
 		var startLogo = new StartLogo(startFunction);
 		endLogo = new EndLogo(startFunction.showlogo);
 		var scorelabel = new Label('score:000000');
@@ -395,11 +398,9 @@ var ReserveMidiEvent=Class.create(Node, {
 	}
 });
 function onnoteon(note,timestamp) {
-	//reserveNote.push(new ReserveMidiEvent(note,timestamp,true));
 	targets[notetonum(note)].midinoteon();
 }
 function onnoteoff(note,timestamp) {
-	//reserveNote.push(new ReserveMidiEvent(note,timestamp,false));
 	targets[notetonum(note)].midinoteoff();
 }
 function clearreservenote() {
@@ -410,6 +411,9 @@ function clearreservenote() {
 }
 function settempo(newtempo,timestamp) {
 	tempo=newtempo;
+}
+function onplaystart(newtempo,timestamp) {
+	waitinfo.hidetext();
 }
 function onsmfready(newtempo,timestamp) {
 	if (reqSMF) {

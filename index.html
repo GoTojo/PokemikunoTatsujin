@@ -36,6 +36,9 @@ function onshowascii(f) {
 function onsmfready() {
 	$('#iframe0')[0].contentWindow.onsmfready();		
 }
+function onplaystart() {
+	$('#iframe0')[0].contentWindow.onplaystart();		
+}
 $(window).keydown(function(e){
 	$('#iframe0')[0].contentWindow.onkbdon(e.keyCode);
   	return false;

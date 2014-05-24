@@ -375,6 +375,7 @@ function getNext() {
 		doInterval();
 		playerinfo.timer = setInterval('doInterval()',playerinfo.buffer);
 		dequeueTimer = setInterval('doDequeue()',playerinfo.buffer);
+		setTimeout(onplaystart,preloadtime);
 		return playerinfo.starttime;
 	}
 	function gettime(tick) {
@@ -481,3 +482,4 @@ function getNext() {
 			i++;
 		}
 	}
+
