@@ -18,8 +18,7 @@
 					</div>
 				</div>
 				整備中です。これからコンテンツを増やしていきます。<br>
-				とりあえず"設定"メニューの簡単な説明とデモ用のSMFを置いておきます。
-				<h4>設定</h4>
+				<h4><strong>設定</strong></h4>
 				<ul>
 				<li>
 					<strong>MIDI INポートの設定</strong><br>
@@ -32,9 +31,7 @@
 				</li>
 				<li>
 					<strong>SMFの設定</strong><br>
-					ポケミクの達人にはメロディ、歌詞データ、伴奏の入ったSMFが必要です。<br>
-					SMFは<a href='http://localhost/~gotojo/TestPocketMikuLyric/'>このアプリ</a>で作ることができます。<br>
-					
+					ポケミクの達人用のメロディ、歌詞データ、伴奏の入ったSMFを選択します。<br>
 				</li>
 				<li>
 					<strong>オートメロディ</strong><br>
@@ -45,7 +42,14 @@
 					外部コントローラーとしてポケットミクを使うか、MIDIコントローラーを使うかを設定します。
 				</li>
 				</ul>
-				<h4>デモ用SMF</h4>
+				<h4><strong>ポケミクの達人用データ</strong></h4>
+					SMF Format0のデータを使います。
+					MIDIチャンネル1にメロディ用のノートオン/オフと歌詞指定用のエクスクルーシブを入れてください。<br>
+					歌詞指定は<code>F0,43,79,09,11,0A,00,文字番号,F7</code>をノートオンの前に1文字ずつ入れます。<br>
+					(文字番号はポケットミクマニュアルの裏表紙の表にあります)<br>
+					<a href='http://localhost/~gotojo/TestPocketMikuLyric/'>このアプリ</a>を
+					使って作ることもできます。<br>		
+				<h4><strong>デモ用SMF</strong></h4>
 				クリックするとダウンロードされます。
 				<ul>
 				<li><a href='smf/sakurasakura60.mid'>さくらさくら(超初級)</a></li>
