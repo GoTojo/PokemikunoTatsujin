@@ -361,6 +361,7 @@ function getNext() {
 		reset();
 		preloadbuf=[];
 		allnoteoff();
+		miku.stop();
 	}
 	function pause() {
 		clearInterval(playerinfo.timer);
@@ -376,6 +377,7 @@ function getNext() {
 		playerinfo.timer = setInterval('doInterval()',playerinfo.buffer);
 		dequeueTimer = setInterval('doDequeue()',playerinfo.buffer);
 		setTimeout(onplaystart,preloadtime);
+		miku.start();
 		return playerinfo.starttime;
 	}
 	function gettime(tick) {
@@ -408,6 +410,7 @@ function getNext() {
 				playerinfo.nexttempo = -1;
 				var tempo=playerinfo.tempo[playerinfo.tempo.length-1];
 				ontempochange(tempo.tempo,tempo.time);
+				miku.settempo(tempo.tempo);
 			}
 			var totaltime = gettime(playerinfo.totaltick);
 			var timestamp = totaltime+playerinfo.starttime;
