@@ -368,6 +368,7 @@ function getNext() {
 		clearInterval(dequeueTimer);
 		playerinfo.playing = false;
 		allnoteoff();
+		miku.stop();
 	}
 	function play() {
 		if (!smfinfo.isValid) return;
@@ -451,7 +452,10 @@ function getNext() {
 		var i=0;
 		while (1) {
 			if (!preloadbuf[i]) {
-				if (!playerinfo.playing) stopDequeue();
+				if (!playerinfo.playing) {
+					stopDequeue();
+					miku.stop();
+				}
 				break;
 			}
 			data=preloadbuf[i];
