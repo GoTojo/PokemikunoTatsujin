@@ -251,9 +251,9 @@ function funcMiku() {
 			} while(this.nexttime<now);
 		}
 	}
-	this.start=function() { 
+	this.start=function(timestamp) { 
 		this.isStart=true; 
-		this.starttime=window.performance.now();
+		this.starttime=timestamp;
 		if (this.tempo) this.nexttime=this.starttime+this.tempo;
 		this.up(); 
 	}
