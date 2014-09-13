@@ -378,7 +378,7 @@ function getNext() {
 		playerinfo.timer = setInterval('doInterval()',playerinfo.buffer);
 		dequeueTimer = setInterval('doDequeue()',playerinfo.buffer);
 		setTimeout(onplaystart,preloadtime);
-		miku.start(playerinfo.starttime+preloadtime);
+		miku.start();
 		return playerinfo.starttime;
 	}
 	function gettime(tick) {
