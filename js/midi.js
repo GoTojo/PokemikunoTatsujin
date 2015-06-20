@@ -4,8 +4,21 @@ var midiAccess = null;
 var output = null;
 
 function listInputsAndOutputs(access) {
-	var inputs = midiAccess.inputs();
-	var outputs = midiAccess.outputs();
+	if (typeof midiAccess.inputs === "function") {
+		var inputs = midiAccess.inputs();	
+		var outputs = midiAccess.outputs();		
+	} else {
+       var inputIterator = midiAccess.inputs.values();
+        inputs = [];
+        for (var o = inputIterator.next(); !o.done; o = inputIterator.next()) {
+            inputs.push(o.value)
+        }
+        var outputIterator = midiAccess.outputs.values();
+        outputs = [];
+        for (var o = outputIterator.next(); !o.done; o = outputIterator.next()) {
+            outputs.push(o.value)
+        }
+	}
 
 	for (var i = 0; i < inputs.length; i++) {
 		var option = document.createElement("option");
@@ -40,8 +53,23 @@ function selectMidiInput() {
 	var options = document.getElementById("midiInputSelect").options;
 	var value = options.item(select.selectedIndex).value;
 	if (select.selectedIndex==0) return;
+	if (typeof midiAccess.inputs === "function") {
+		var inputs = midiAccess.inputs();	
+		var outputs = midiAccess.outputs();		
+	} else {
+       var inputIterator = midiAccess.inputs.values();
+        inputs = [];
+        for (var o = inputIterator.next(); !o.done; o = inputIterator.next()) {
+            inputs.push(o.value)
+        }
+        var outputIterator = midiAccess.outputs.values();
+        outputs = [];
+        for (var o = outputIterator.next(); !o.done; o = outputIterator.next()) {
+            outputs.push(o.value)
+        }
+	}
+
 	try { 
-		var inputs = midiAccess.inputs();
 		var input = inputs[select.selectedIndex-1];
 		input.onmidimessage = onMIDIMessage;
 	} catch (e) {
@@ -54,8 +82,22 @@ function selectMidiOutput() {
 	var options = document.getElementById("midiOutputSelect").options;
 	var value = options.item(select.selectedIndex).value;
 	if (select.selectedIndex==0) return;
+	if (typeof midiAccess.inputs === "function") {
+		var inputs = midiAccess.inputs();	
+		var outputs = midiAccess.outputs();		
+	} else {
+       var inputIterator = midiAccess.inputs.values();
+        inputs = [];
+        for (var o = inputIterator.next(); !o.done; o = inputIterator.next()) {
+            inputs.push(o.value)
+        }
+        var outputIterator = midiAccess.outputs.values();
+        outputs = [];
+        for (var o = outputIterator.next(); !o.done; o = outputIterator.next()) {
+            outputs.push(o.value)
+        }
+	}
 	try { 
-		var outputs = midiAccess.outputs();
 		output = outputs[select.selectedIndex-1];
 		console.log('output('+output.name+')is selected')
 	} catch (e) {
