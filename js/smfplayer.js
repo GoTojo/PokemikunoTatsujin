@@ -407,16 +407,29 @@ function getNext() {
 			};
 			playerinfo.totaltick += message.deltatime;
 			if (message.type=="meta:tempo") {
+				var gamelevel=$('*[name="level"]:checked').val();
+				var ratio=1.0;
+				switch (gamelevel) {
+					case 'easy':
+						ratio=2.0;
 						break;
+					case 'normal':
+						ratio=1.2;
 						break;
+					case 'hard':
+						ratio=1.0;
+						break;
+				}
+				var nexttempo=Math.round(playerinfo.nexttempo*ratio);
 				playerinfo.nexttempo = -1;
+				setTempo(playerinfo.totaltick,nexttempo);
 				var tempo=playerinfo.tempo[playerinfo.tempo.length-1];
 				ontempochange(tempo.tempo,tempo.time);
 				miku.settempo(tempo.tempo);
 			}
 			var totaltime = gettime(playerinfo.totaltick);
 			var timestamp = totaltime+playerinfo.starttime;
-			//showData(timestamp,message);
+			// showData(timestamp,message);
 			if (message.type=="data") {
 				preloadbuf.push({message:message.message,timestamp:timestamp+preloadtime});
 				onmessage(message.message,totaltime+preloadtime);
