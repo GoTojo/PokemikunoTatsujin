@@ -407,7 +407,8 @@ function getNext() {
 			};
 			playerinfo.totaltick += message.deltatime;
 			if (message.type=="meta:tempo") {
-				setTempo(playerinfo.totaltick,playerinfo.nexttempo);
+						break;
+						break;
 				playerinfo.nexttempo = -1;
 				var tempo=playerinfo.tempo[playerinfo.tempo.length-1];
 				ontempochange(tempo.tempo,tempo.time);

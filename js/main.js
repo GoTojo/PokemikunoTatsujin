@@ -137,10 +137,11 @@ var WordObjBase=Class.create(Sprite, {
 		var curtime=window.performance.now()-starttime;
 		if (this.begintime!=0) {
 			if (this.dropping) {
-				var framecount=tempo*4/1000000*fps;
-				var downstep=dropHeight/framecount;
+				var framecount=1.0*tempo*4/1000000*fps;
+				var downstep=Math.ceil(dropHeight/framecount);
 				this.y+=downstep;
 				if (this.y>=lastPosY) {
+					// console.log("reached! note:"+this.note+" tempo:"+tempo+" y:"+this.y+" lastPosY:"+lastPosY);
 					this.dropping=false;
 					this.y=lastPosY;
 					if (this.reachfunc) this.reachfunc();
@@ -169,12 +170,15 @@ var WordObj=Class.create(WordObjBase, {
 		this.frame=word;
 	},
 	beginfunc: function() {
+		// console.log("word:"+this.frame+" begin");
 		targets[this.num].blinkon();
 	},
 	reachfunc: function() {
+		// console.log("word:"+this.frame+" reach");
 		targets[this.num].noteon();
 	},
 	endfunc: function() {
+		// console.log("word:"+this.frame+" end");
 		for (var i=0;i<words.length;i++) {
 			if (words[this.note][i] == this) { // may be i==0, for safety
 				words[this.note].splice(i,1);
